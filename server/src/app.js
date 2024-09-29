@@ -4,7 +4,6 @@ import cookieParser from "cookie-parser";
 import { limiter } from "./middlewares/rateLimiter.middleware.js";
 import requestIp from "request-ip";
 
-
 const app = express();
 
 app.use(
