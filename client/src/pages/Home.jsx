@@ -2,32 +2,95 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import React, { useState, useEffect, useRef } from "react";
 import { IoSend } from "react-icons/io5";
-import { FaRegWindowRestore } from "react-icons/fa6";
-import { FaRegWindowMaximize } from "react-icons/fa6";
+import { FaRegWindowRestore, FaRegWindowMaximize } from "react-icons/fa6";
 import { RxCross2 } from "react-icons/rx";
+import { useParams } from "react-router-dom";
+import { ChatBot } from "@/services";
+
 const Chatbot = () => {
+  const [toggle, setToggle] = useState(false);
   const [messages, setMessages] = useState([]);
   const [input, setInput] = useState("");
   const [portabalBotWindow, setPortabalBotWindow] = useState(true);
   const [toggleBot, setToggleBot] = useState(false);
   const messageEndRef = useRef(null);
-
+  const { categoryId } = useParams();
+  const [data, setData] = useState(null);
   useEffect(() => {
     messageEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  const handleSendMessage = () => {
+  const handleSendMessage = async () => {
     if (input.trim() !== "") {
-      setMessages([...messages, { text: input, sender: "user" }]);
-      setInput("");
-      setTimeout(() => {
+      // Add user's message to messages state
+      setMessages((prevMessages) => [
+        ...prevMessages,
+        { text: input, sender: "user" },
+      ]);
+
+      // Call chatbot service with user input
+      const res = await ChatBot.handleMessages({
+        message: null,
+        categoryid: categoryId || input,
+        answer: input,
+      });
+      setToggle(!toggle);
+      if (res && res.botResponse && res.botResponse[0]) {
+        if (res.data) {
+          setData(res.data);
+        }
+        // Add bot's response to messages state
         setMessages((prevMessages) => [
           ...prevMessages,
-          { text: "Cutu is best!", sender: "bot" },
+          { text: res.botResponse[0], sender: "bot" },
         ]);
-      }, 1000);
+     
+      }
+      // Clear the input field
+      setInput("");
     }
   };
+
+  useEffect(() => {
+    // if(!categoryId) return;
+    (async () => {
+      const res = await ChatBot.handleMessages({
+        message: null,
+        categoryid: categoryId,
+        answer: null,
+      });
+      if (res) {
+        if (res.data) {
+          setData(res.data);
+        }
+        setMessages((prevMessages) => [
+          ...prevMessages,
+          { text: res.botResponse[0], sender: "bot" },
+        ]);
+        if (res?.question_options.length) {
+          res.question_options.map((msg) => {
+            setMessages((prevMessages) => [
+              ...prevMessages,
+              {
+                text: (
+                  <Button
+                    value={msg}
+                    onClick={(e) => {
+                      setInput(e.target.value);
+                    }}
+                  >
+                    {msg}
+                  </Button>
+                ),
+                sender: "bot",
+              },
+            ]);
+          });
+         
+        }
+      }
+    })();
+  }, [categoryId, toggle]);
 
   return (
     <div
@@ -67,7 +130,95 @@ const Chatbot = () => {
             />
           </div>
           <div className="h-full w-full p-4 pb-16 overflow-y-auto no-scrollbar space-y-3">
-            {messages.map((message, index) => (
+            {data&&
+              (<form className="mx-2 ">
+                <div className="grid gap-2 text-center ">
+                  <h1 className="text-3xl font-bold text-white">Sign Up</h1>
+                </div>
+                <div className="grid gap-4 text-black dark:text-white">
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="fullName"
+                      className="text-white"
+                    >
+                      Name
+                    </label>
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      value={data ? data.name : ""}
+                      placeholder="John D'Souza"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="email"
+                      className="text-white"
+                    >
+                      Email
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      value={data ? data.email : ""}
+                      name="email"
+                      placeholder="m@example.com"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="username"
+                      className="text-white"
+                    >
+                      Mobile No.
+                    </label>
+                    <input
+                      id="username"
+                      type="number"
+                      value={data ? data.mob_no : ""}
+                      name="username"
+                      placeholder="Striver"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="username"
+                      className="text-white"
+                    >
+                      Zip Code
+                    </label>
+                    <input
+                      id="username"
+                      type="number"
+                      value={data ? data.zip : ""}
+                      name="username"
+                      placeholder="Striver"
+                    />
+                  </div>
+                  <div className="grid gap-2">
+                    <label
+                      htmlFor="fullName"
+                      className="text-white"
+                    >
+                      Address
+                    </label>
+                    <input
+                      id="fullName"
+                      name="fullName"
+                      type="text"
+                      value={data ? data.address : ""}
+                      placeholder="John D'Souza"
+                    />
+                  </div>
+                  <Button type="submit" className="w-full">
+                    Submit
+                  </Button>
+                </div>
+              </form>)
+            }
+
+            {!data&&messages.map((message, index) => (
               <div
                 key={index}
                 className={`flex space-x-2 ${
@@ -85,12 +236,11 @@ const Chatbot = () => {
                   className={`py-2 px-3 max-w-[65%] w-fit ${
                     message.sender === "user"
                       ? "bg-white text-black rounded-b-2xl rounded-tl-2xl ml-auto"
-                      : "bg-black text-white rounded-b-2xl rounded-tr-2xl mr-auto"
+                      : "bg-slate-700 text-white rounded-b-2xl rounded-tr-2xl mr-auto"
                   }`}
                 >
                   {message.text}
                 </div>
-
                 {message.sender === "user" && (
                   <img
                     src="profile.png"

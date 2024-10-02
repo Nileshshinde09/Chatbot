@@ -2,6 +2,8 @@ import { ApiResponse } from "../utils/ApiResponse.js";
 import { asyncHandler } from "../utils/asyncHandler.js";
 import os from "os"
 const healthcheck = asyncHandler(async (req, res) => {
+    console.log(req.get("data"));
+    
     return res.status(200)
         .json(
             new ApiResponse(

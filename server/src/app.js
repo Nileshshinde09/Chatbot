@@ -25,8 +25,6 @@ app.use((req, res, next) => {
     next()
 }) 
 
-
-
 app.use(requestIp.mw());
 app.use(limiter);
 app.use(express.json({ limit: "20kb" }));
@@ -41,6 +39,12 @@ import healthcheck from "./routes/healthcheck.routes.js";
 app.use("/api/v1/healthcheck", healthcheck)
 //-------------------------------------------------------------
 
+
+//Chatbot route
+//-------------------------------------------------------------
+import chatbotroute from "./routes/chatbot.routes.js";
+app.use("/api/v1/chatbot", chatbotroute)
+//-------------------------------------------------------------
 
 
 

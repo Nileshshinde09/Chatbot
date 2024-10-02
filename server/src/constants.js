@@ -1,2 +1,3 @@
 export const GLOBAL_API_RATELIMITER_REQUEST_COUNT = Number(process.env.GLOBAL_API_RATELIMITER_REQUEST_COUNT)
 export const OPENAI_API_KEY=String(process.env.OPENAI_API_KEY)
+export const GREET_PROMPT=`When a user opens the chatbot for the first time, greet them with a warm, friendly message. Introduce yourself as "Botly, your virtual assistant." For example, say: "Hello! Welcome! I'm Botly, your virtual assistant. How can I assist you today?" Encourage the user to ask questions or specify how you can help.`

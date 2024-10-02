@@ -1,37 +1,94 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Full Screen Embedded Chatbot Application</title>
-  <style>
-    body, html {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      background: linear-gradient(135deg, #ece9e6, #ffffff);
-      font-family: 'Arial', sans-serif;
-    }
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Full Screen Embedded Chatbot Application</title>
+    <style>
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: "Arial", sans-serif;
+        flex-direction: column; 
+      }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-    }
-    h1{
-     width: 100%; 
-     position: absolute;
-     top: 10px;
-     text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <h1>Test Website</h1>
-  <iframe src="http://localhost:5173/" title="Chatbot Application"></iframe>
-</body>
+      iframe {
+        width: 100%;
+        height: 80%; /* Adjust height as needed */
+        border: none;
+        position: absolute;
+        bottom: 15px;
+        right: 15px;
+      }
+
+      h1 {
+        width: 100%;
+        position: absolute;
+        top: 10px;
+        text-align: center;
+      }
+
+      .input-container {
+        position: absolute;
+        top: 100px; /* Adjust position as needed */
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        gap: 10px; /* Space between input and button */
+        z-index: 100;
+      }
+
+      input[type="number"] {
+        padding: 10px;
+        font-size: 16px;
+        width: 200px; /* Set a width for the input */
+      }
+
+      button {
+        padding: 10px;
+        font-size: 16px;
+        cursor: pointer;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Test Website</h1>
+    <div class="input-container">
+      <input
+        type="number"
+        id="categoryInput"
+        placeholder="Enter Category ID"
+        min="0"
+        required
+      />
+      <button id="loadButton">Load Category</button>
+    </div>
+    <iframe
+      id="chatbotIframe"
+      src="http://localhost:5173/"
+      title="Chatbot Application"
+    ></iframe>
+
+    <script>
+      document
+        .getElementById("loadButton")
+        .addEventListener("click", function () {
+          const categoryInput = document.getElementById("categoryInput");
+          const categoryId = categoryInput.value;
+          const iframe = document.getElementById("chatbotIframe");
+          if (categoryId !== "") {
+            iframe.src = `http://localhost:5173/${categoryId}`;
+          } else {
+            iframe.src = "http://localhost:5173/";
+          }
+          categoryInput.value = "";
+        });
+    </script>
+  </body>
 </html>
